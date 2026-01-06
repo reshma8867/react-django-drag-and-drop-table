@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>Drag Student</h2>
+    <div class="studentlist">
+        {% for student in students %}
+            <div class="student" draggable="true" data-id="{{ student.id }}">
+                <p>Name: {{ student.name }}</p>
+                <p>Age: {{ student.age }}</p>
+                <p>Email: {{ student.email }}</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        let draggedItem = null;
+        document.querySelectorAll('.student').forEach(item => {
+            item.addEventListener('dragstart', function (e) {
+                draggedItem = this;
+                setTimeout(() => {
+                    this.style.display = 'none';
+                }, 0);
+            });
+
+            item.addEventListener('dragend', function (e) {
+                setTimeout(() => {
+                    draggedItem.style.display = 'block';
+                    draggedItem = null;
+                }, 0);
+            });
+
+            item.addEventListener('dragover', function (e) {
+                e.preventDefault();
+            });
+
+            item.addEventListener('dragenter', function (e) {
+                e.preventDefault();
+                this.style.border = '2px dashed #000';
+            });
+
+            item.addEventListener('dragleave', function (e) {
+                this.style.border = 'none';
+            });
+
+            item.addEventListener('drop', function (e) {
+                this.style.border = 'none';
+                if (draggedItem !== this) {
+                    let container = document.querySelector('.studentlist');
+                    let items = Array.from(container.querySelectorAll('.student'));
+                    let draggedIndex = items.indexOf(draggedItem);
+                    let targetIndex = items.indexOf(this);
+
+                    if (draggedIndex < targetIndex) {
+                        container.insertBefore(draggedItem, this.nextSibling);
+                    } else {
+                        container.insertBefore(draggedItem, this);
+                    }
+
+                    // Send new order to server
+                    let order = Array.from(container.querySelectorAll('.student')).map(item => item.getAttribute('data-id'));
+                    fetch('/save_order/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({ order: order })
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
