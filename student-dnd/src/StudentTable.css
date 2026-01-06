@@ -1,0 +1,22 @@
+.student-table {
+  width: 70%;
+  margin: 30px auto;
+  border-collapse: collapse;
+  font-family: Arial, sans-serif;
+}
+
+.student-table th,
+.student-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+}
+
+.student-table thead {
+  background-color: #222;
+  color: red;
+}
+
+.student-table tr {
+  background-color: #f9f9f9;
+}
